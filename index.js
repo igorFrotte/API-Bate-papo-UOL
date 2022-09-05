@@ -28,6 +28,33 @@ const messageSchema = joi.object({
   type: joi.string().required().valid('message','private_message')
 });
 
+setInterval( async () => {
+  const realTime = Date.now();
+
+  try {
+    const users = await db.collection("participante").find().toArray()
+
+    users.map( async (e) => {
+      if(realTime - e.lastStatus > 10000){
+        await db
+          .collection("participante")
+          .deleteOne({_id: ObjectId(e._id)});
+        await db
+          .collection("mensagem")
+          .insertOne({
+            from: e.name, 
+            to: 'Todos', 
+            text: 'sai da sala...', 
+            type: 'status', 
+            time: dayjs().format("HH:mm:ss") 
+          });
+      } 
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}, 15000)
+
 app.post("/participants", async (req, res) => {
   const { name } = req.body;
 
