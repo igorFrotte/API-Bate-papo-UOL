@@ -63,4 +63,15 @@ app.post("/participants", async (req, res) => {
   }
 });
 
+app.get("/participants", async (req, res) => {
+  try {
+    const response = await db.collection("participante").find().toArray();
+    res.send(response);
+  } catch (error) {
+    res.sendStatus(500).send(error.message);
+  }
+});
+
+
+
 app.listen(5000);
