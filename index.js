@@ -116,6 +116,20 @@ app.post("/messages", async (req, res) => {
   }
 });
 
+app.get("/messages", async (req, res) => {
+  const { user } = req.headers;
+  const limit = parseInt(req.query.limit);
+
+  try {
+    const response = await db.collection("mensagem").find().toArray();
+    const msgs = response.filter((e) => e.to === "Todos" || e.to === user || e.from === user || e.type === "message");
+
+    res.send(msgs.slice(limit*-1));
+  } catch (error) {
+    res.sendStatus(500).send(error.message);
+  }
+});
+
 
 
 app.listen(5000);
