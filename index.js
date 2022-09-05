@@ -130,6 +130,30 @@ app.get("/messages", async (req, res) => {
   }
 });
 
+app.post("/status", async (req, res) => {
+  const { user } = req.headers;
 
+  try {
+    const userExist = await db
+      .collection("participante")
+      .findOne({ name: user });
+    
+    if(!userExist){
+      res.status(404).send();
+      return;
+    }
+
+    await db
+      .collection("participante")
+      .updateOne(
+        { _id: userExist._id }, 
+        { $set: {lastStatus: Date.now()} }
+      );
+
+    res.status(200).send(); 
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 app.listen(5000);
